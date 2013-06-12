@@ -7,6 +7,7 @@
 <html>
 <head>
 <title>To-Do Web App</title>
+<link rel="stylesheet" type="text/css" href="stylesheets/main.css">
 </head>
 <body>
 <h1>Your to do list</h1>
