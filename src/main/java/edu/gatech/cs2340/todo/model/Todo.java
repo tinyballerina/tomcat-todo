@@ -2,8 +2,8 @@ package edu.gatech.cs2340.todo.model;
 
 public class Todo {
     
-    String title;
-    String task;
+    private String title;
+    private String task;
 
     public Todo(String title, String task) {
         this.title = title;

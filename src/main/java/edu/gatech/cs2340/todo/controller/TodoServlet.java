@@ -1,6 +1,8 @@
 package edu.gatech.cs2340.todo.controller;
 
 import edu.gatech.cs2340.todo.model.Todo;
+import edu.gatech.cs2340.todo.model.TodoDb;
+import edu.gatech.cs2340.todo.model.TodoDbTreeMapImpl;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.TreeMap;
@@ -19,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
     })
 public class TodoServlet extends HttpServlet {
 
-    TreeMap<Integer, Todo> todos = new TreeMap<>();
+    TodoDb todoDb = new TodoDbTreeMapImpl();
 
     @Override
     protected void doPost(HttpServletRequest request,
@@ -42,8 +44,8 @@ public class TodoServlet extends HttpServlet {
         } else {
             String title = request.getParameter("title");
             String task = request.getParameter("task");
-            todos.put(todos.size(), new Todo(title, task));
-            request.setAttribute("todos", todos);
+            todoDb.create(new Todo(title, task));
+            request.setAttribute("todos", todoDb.list());
             RequestDispatcher dispatcher = 
                 getServletContext().getRequestDispatcher("/list.jsp");
             dispatcher.forward(request,response);
@@ -58,7 +60,7 @@ public class TodoServlet extends HttpServlet {
                          HttpServletResponse response)
             throws IOException, ServletException {
         System.out.println("In doGet()");
-        request.setAttribute("todos", todos);
+        request.setAttribute("todos", todoDb.list());
         RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/list.jsp");
         dispatcher.forward(request,response);
@@ -70,9 +72,9 @@ public class TodoServlet extends HttpServlet {
         System.out.println("In doPut()");
         String title = (String) request.getParameter("title");
         String task = (String)  request.getParameter("task");
-        int id = getId(request);
-        todos.put(id, new Todo(title, task));
-        request.setAttribute("todos", todos);
+        Integer id = getId(request);
+        todoDb.update(id, new Todo(title, task));
+        request.setAttribute("todos", todoDb.list());
         RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/list.jsp");
         dispatcher.forward(request,response);
@@ -82,15 +84,15 @@ public class TodoServlet extends HttpServlet {
                             HttpServletResponse response)
             throws IOException, ServletException {
         System.out.println("In doDelete()");
-        int id = getId(request);
-        todos.remove(id);
-        request.setAttribute("todos", todos);
+        Integer id = getId(request);
+        todoDb.delete(id);
+        request.setAttribute("todos", todoDb.list());
         RequestDispatcher dispatcher = 
             getServletContext().getRequestDispatcher("/list.jsp");
         dispatcher.forward(request,response);
     }
 
-    private int getId(HttpServletRequest request) {
+    private Integer getId(HttpServletRequest request) {
         String uri = request.getPathInfo();
         // Strip off the leading slash, e.g. "/2" becomes "2"
         String idStr = uri.substring(1, uri.length()); 
